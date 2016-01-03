@@ -29,7 +29,7 @@ func TestResultMarshalJSON(t *testing.T) {
 		},
 	}
 	result := product_scraper.NewResult(products)
-	jbytes, _ := json.MarshalIndent(result, "", "    ")
+	jbytes, _ := json.MarshalIndent(result, "", "  ")
 
 	expected, err := ioutil.ReadFile("testdata/result.json") // For read access.
 	if err != nil {

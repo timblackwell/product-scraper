@@ -2,6 +2,7 @@ package product_scraper_test
 
 import (
 	"fmt"
+	"github.com/fortx/api/vendor/github.com/go-kit/kit/log"
 	"github.com/timblackwell/product-scraper"
 	"net/http"
 	"os"
@@ -50,7 +51,7 @@ func TestNormal(t *testing.T) {
 	urlResource[kiwi] = "testdata/Sainsbury's Kiwi Fruit, Ripe & Ready x4.html"
 	mock := mockHttp{urlResource: urlResource}
 
-	scraper := product_scraper.NewScraper(mock)
+	scraper := product_scraper.NewScraper(mock, log.NewNopLogger())
 	results, err := scraper.Scrape([]string{index})
 	if err != nil {
 		t.Error(err)
@@ -70,7 +71,7 @@ func TestNoSeed(t *testing.T) {
 	urlResource := make(map[string]string)
 	mock := mockHttp{urlResource: urlResource}
 
-	scraper := product_scraper.NewScraper(mock)
+	scraper := product_scraper.NewScraper(mock, log.NewNopLogger())
 	results, err := scraper.Scrape([]string{"http://notfound.com"})
 	if err != nil {
 		t.Error(err)
@@ -93,7 +94,7 @@ func TestMissingProducts(t *testing.T) {
 	urlResource[apricot] = "testdata/Sainsbury's Apricot Ripe & Ready x5.html"
 	mock := mockHttp{urlResource: urlResource}
 
-	scraper := product_scraper.NewScraper(mock)
+	scraper := product_scraper.NewScraper(mock, log.NewNopLogger())
 	results, err := scraper.Scrape([]string{index})
 	if err != nil {
 		t.Error(err)

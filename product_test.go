@@ -15,7 +15,7 @@ func TestProductMarshalJSON(t *testing.T) {
 		UnitPrice:   180,
 	}
 
-	jbytes, _ := json.MarshalIndent(product, "", "    ")
+	jbytes, _ := json.MarshalIndent(product, "", "  ")
 
 	expected, err := ioutil.ReadFile("testdata/product.json") // For read access.
 	if err != nil {

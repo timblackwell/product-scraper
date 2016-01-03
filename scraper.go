@@ -2,19 +2,27 @@ package product_scraper
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-kit/kit/log"
 	"regexp"
 	"strconv"
 )
 
 type Scraper struct {
 	httpClient IHttpClient
+	logger     log.Logger
 }
 
-func NewScraper(client IHttpClient) Scraper {
-	return Scraper{httpClient: client}
+func NewScraper(client IHttpClient, logger log.Logger) Scraper {
+	// all logs from this struct will have the key val "struct", "Scraper"
+	// included for identification
+	contextLogger := log.NewContext(logger).With("struct", "Scraper")
+	return Scraper{httpClient: client, logger: contextLogger}
 }
 
 func (scraper Scraper) Scrape(urls []string) (Results, error) {
+	// all logs from this function will have function name included
+	logger := log.NewContext(scraper.logger).With("func", "scrape")
+	logger.Log("level", "trace", "message", "started scraping", "urls", len(urls))
 	// array and map for storing products scraped and urls visited
 	foundProducts := []Product{}
 	foundProductUrls := make(map[string]bool)
@@ -38,13 +46,14 @@ func (scraper Scraper) Scrape(urls []string) (Results, error) {
 		// ensures we dont ever scrape the same url twice
 		case url := <-chUrls:
 			{
+				logger.Log("level", "trace", "message", "Found product URL", "url", url)
 				foundProductUrls[url] = true
 			}
 		// url scraper returned
 		case err := <-chScrapeUrl:
 			{
 				if err != nil {
-					//todo log error
+					logger.Log("level", "info", "message", "Error occured while scraping for product urls.", "error", err.Error())
 				}
 				c++
 			}
@@ -63,18 +72,21 @@ func (scraper Scraper) Scrape(urls []string) (Results, error) {
 		case product := <-chProducts:
 			{
 				// add product to list
+				logger.Log("level", "trace", "message", "Scraped product info", "title", product.Title)
 				foundProducts = append(foundProducts, product)
 			}
 		// product scraper returned
 		case err := <-chScrapeProduct:
 			{
 				if err != nil {
-					//todo log error
+					logger.Log("level", "info", "message", "Error occured while scraping for product info.", "error", err.Error())
 				}
 				c++
 			}
 		}
 	}
+
+	logger.Log("level", "trace", "message", "Finished scraping.", "products", len(foundProducts))
 
 	// create new result object from scraped products and return
 	return NewResult(foundProducts), nil
@@ -87,10 +99,14 @@ func (scraper Scraper) scrapeProduct(url string, chProduct chan Product, chRetur
 		chReturn <- err
 	}()
 
+	// all logs from this function will have function name included
+	logger := log.NewContext(scraper.logger).With("func", "scrapeProduct", "url", url)
+
 	// get http response for url
 	resp, err := scraper.httpClient.Get(url)
 	if err != nil {
 		// error getting url. Cant continue
+		logger.Log("level", "info", "message", "Error during http get", "error", err.Error())
 		return
 	}
 
@@ -98,6 +114,7 @@ func (scraper Scraper) scrapeProduct(url string, chProduct chan Product, chRetur
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		// error getting parsing html body. Cant continue
+		logger.Log("level", "info", "message", "Error parsing response body as HTML", "error", err.Error())
 		return
 	}
 
@@ -139,10 +156,14 @@ func (scraper Scraper) scrapeLinks(url string, chUrl chan string, chReturn chan 
 		chReturn <- err
 	}()
 
+	// all logs from this function will have function name included
+	logger := log.NewContext(scraper.logger).With("func", "scrapeLinks", "url", url)
+
 	// get http response for url
 	resp, err := scraper.httpClient.Get(url)
 	if err != nil {
 		// error getting url. Cant continue
+		logger.Log("level", "info", "message", "Error during http get", "error", err.Error())
 		return
 	}
 
@@ -150,6 +171,7 @@ func (scraper Scraper) scrapeLinks(url string, chUrl chan string, chReturn chan 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		// error getting parsing html body. Cant continue
+		logger.Log("level", "info", "message", "Error parsing response body as HTML", "error", err.Error())
 		return
 	}
 
