@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "description": "Avocados",
+      "size": "44 kB",
+      "title": "Sainsbury's Avocado, Ripe \u0026 Ready x2",
+      "unit_price": 1.8
+    },
+    {
+      "description": "Avocados",
+      "size": "40 kB",
+      "title": "Sainsbury's Avocados, Ripe \u0026 Ready x4",
+      "unit_price": 3.2
+    },
+    {
+      "description": "Avocados",
+      "size": "40 kB",
+      "title": "Sainsbury's Avocado Ripe \u0026 Ready XL Loose 300g",
+      "unit_price": 1.5
+    }
+  ],
+  "total": 6.5
+}
