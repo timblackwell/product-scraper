@@ -9,12 +9,12 @@ import (
 	"testing"
 )
 
-// mock http client used to control the tests
+// mockHttp client used to control the tests
 type mockHttp struct {
 	urlResource map[string]string
 }
 
-// implementing IHttpClient interface
+// Get implements IHttpClient interface
 func (mock mockHttp) Get(url string) (response *http.Response, err error) {
 	// check to see if there is a local resource for the url
 	resource := mock.urlResource[url]
@@ -40,7 +40,7 @@ func (mock mockHttp) Get(url string) (response *http.Response, err error) {
 
 	// create response, giving file (implements io.ReadCloser)
 	response = &http.Response{
-		Body: resourceHtml,
+		Body:          resourceHtml,
 		ContentLength: info.Size(),
 	}
 
@@ -48,7 +48,7 @@ func (mock mockHttp) Get(url string) (response *http.Response, err error) {
 	return
 }
 
-// test with working example
+// TestNormal test with working example
 func TestNormal(t *testing.T) {
 	// create mapping between the urls and local resources we want to serve
 	index := "http://hiring-tests.s3-website-eu-west-1.amazonaws.com/2015_Developer_Scrape/5_products.html"
@@ -95,6 +95,7 @@ func TestNormal(t *testing.T) {
 
 }
 
+// TestNoSeed tests the scraper when the seed url is not found
 func TestNoSeed(t *testing.T) {
 	// create mock with no mapping. we want the error to hit the scraper
 	urlResource := make(map[string]string)
@@ -123,7 +124,7 @@ func TestNoSeed(t *testing.T) {
 	}
 }
 
-// this test makes sure that if an error occurs scraping one
+// TestMissingProducts test that if an error occured while  scraping one
 // url, it doesn't effect another
 func TestMissingProducts(t *testing.T) {
 	// create a mapping with only a few urls
@@ -164,7 +165,7 @@ func TestMissingProducts(t *testing.T) {
 		Title:       "Sainsbury's Avocado, Ripe & Ready x2",
 		Description: "Avocados",
 		Size:        44479,
-		UnitPrice:   180,	}
+		UnitPrice:   180}
 
 	if product.Title != expected.Title {
 		// test failed

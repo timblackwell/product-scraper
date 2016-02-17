@@ -7,11 +7,14 @@ import (
 	"strconv"
 )
 
+// Scraper contains the httpClient and logger needed to scrape urls
 type Scraper struct {
 	httpClient IHttpClient
 	logger     log.Logger
 }
 
+// NewScraper is a helper method to construct new Scraper with
+// added logging context.
 func NewScraper(client IHttpClient, logger log.Logger) Scraper {
 	// all logs from this struct will have the key val "struct", "Scraper"
 	// included for identification
@@ -19,6 +22,9 @@ func NewScraper(client IHttpClient, logger log.Logger) Scraper {
 	return Scraper{httpClient: client, logger: contextLogger}
 }
 
+// Scrape take slice of urls and returns a Result and error.
+// This process scrapes the seed urls for product urls, then scrapes products
+// found from these product urls.
 func (scraper Scraper) Scrape(urls []string) (Results, error) {
 	// all logs from this function will have function name included
 	logger := log.NewContext(scraper.logger).With("func", "scrape")
@@ -92,6 +98,8 @@ func (scraper Scraper) Scrape(urls []string) (Results, error) {
 	return NewResult(foundProducts), nil
 }
 
+// scrapeProduct scrapes the product data from the url, sending the product
+// back on the Product channel.
 func (scraper Scraper) scrapeProduct(url string, chProduct chan Product, chReturn chan error) {
 	var err error
 	defer func() {
@@ -149,6 +157,8 @@ func (scraper Scraper) scrapeProduct(url string, chProduct chan Product, chRetur
 	chProduct <- product
 }
 
+// scrapeLinks scrapes product urls from the seed url, sending found
+// product urls bacl on the chUrl channel.
 func (scraper Scraper) scrapeLinks(url string, chUrl chan string, chReturn chan error) {
 	var err error
 	defer func() {

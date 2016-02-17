@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// TestResultMarshalJSON tests the custom MarshalJSON method
 func TestResultMarshalJSON(t *testing.T) {
 	products := []product_scraper.Product{
 		product_scraper.Product{

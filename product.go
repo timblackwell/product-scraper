@@ -5,7 +5,7 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-// store the product details. Unit price is in pence.
+// Product stores the product details. Unit price is in pence.
 // Size is in bytes
 type Product struct {
 	Title       string
@@ -14,6 +14,8 @@ type Product struct {
 	Size        int64
 }
 
+// MarshalJSON converts the product to JSON byte array
+// and returns this with an error.
 func (p Product) MarshalJSON() ([]byte, error) {
 	// convert unit price to float and divide so
 	// can be shown as pounds.

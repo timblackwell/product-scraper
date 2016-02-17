@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+// TestProductMarshalJSON tests the MarshalJSON method on the product
+// class.
 func TestProductMarshalJSON(t *testing.T) {
 	product := product_scraper.Product{
 		Title:       "Sainsbury's Avocado, Ripe & Ready x2",
